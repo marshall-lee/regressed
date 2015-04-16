@@ -23,14 +23,14 @@ Or install it yourself as:
 RSpec:
 
 ```ruby
-    # spec/spec_helper.rb
-    require 'regressed/rspec'
+# spec/spec_helper.rb
+require 'regressed/rspec'
 ```
 
 Minitest:
 
 ```ruby
-    require 'regressed/minitest'
+require 'regressed/minitest'
 ```
 
 ## Contributing
