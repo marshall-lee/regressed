@@ -16,10 +16,18 @@ module TempRepo
 
   attr_reader :repo_path
 
+  def user_name
+    'Alan Turing'
+  end
+
+  def user_email
+    'alan@bletchey.park'
+  end
+
   def author
     {
-      email: 'developer@olol.ru',
-      name: 'Vladimir Mitnik',
+      email: user_email,
+      name: user_name,
       time: Time.now
     }
   end
@@ -99,6 +107,8 @@ module TempRepo
     Rugged::Repository.init_at repo_path
 
     @repo = Rugged::Repository.new(repo_path)
+    @repo.config['user.name'] = user_name
+    @repo.config['user.email'] = user_email
     if block_given?
       yield
       destroy_repo
