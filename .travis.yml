@@ -1,3 +1,3 @@
 language: ruby
 rvm:
-  - head
+  - ruby-head
