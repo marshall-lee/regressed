@@ -1,0 +1,5 @@
+source 'https://rubygems.org'
+
+gem 'regressed', path: '../../../'
+gem 'rspec', '~> 3.2.0'
+gem 'minitest', '~> 5.5.1'
