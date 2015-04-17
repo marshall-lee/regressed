@@ -1,4 +1,6 @@
 # Regressed
+
+[![Join the chat at https://gitter.im/marshall-lee/regressed](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/marshall-lee/regressed?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/marshall-lee/regressed.svg)](https://travis-ci.org/marshall-lee/regressed)
 
 Regression Test Prediction implementation as [described](http://tenderlovemaking.com/2015/02/13/predicting-test-failues.html) by [Aaron Patterson](https://github.com/tenderlove). [RSpec](https://github.com/rspec) and [Minitest](https://github.com/seattlerb/minitest) are supported.
