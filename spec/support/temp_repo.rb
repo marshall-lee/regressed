@@ -120,7 +120,8 @@ module TempRepo
   end
 
   def execute(cmd, env={})
+    env = Bundler::ORIGINAL_ENV.merge(env)
     env.merge! 'BUNDLE_GEMFILE' => File.join(repo_path, 'Gemfile')
-    system env, "cd #{repo_path} && #{cmd}"
+    system env, cmd, chdir: repo_path
   end
 end
