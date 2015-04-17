@@ -1,7 +1,7 @@
 # Regressed
 [![Build Status](https://travis-ci.org/marshall-lee/regressed.svg)](https://travis-ci.org/marshall-lee/regressed)
 
-Regression Test Selection implementation as [described](http://tenderlovemaking.com/2015/02/13/predicting-test-failues.html) by [Aaron Patterson](https://github.com/tenderlove). [RSpec](https://github.com/rspec) and [Minitest](https://github.com/seattlerb/minitest) are supported.
+Regression Test Prediction implementation as [described](http://tenderlovemaking.com/2015/02/13/predicting-test-failues.html) by [Aaron Patterson](https://github.com/tenderlove). [RSpec](https://github.com/rspec) and [Minitest](https://github.com/seattlerb/minitest) are supported.
 
 ## Installation
 
