@@ -14,7 +14,7 @@ describe 'Integration with test frameworks' do
   end
 
   after(:all) do
-    # destroy_repo 'whatever'
+    destroy_repo 'whatever'
   end
 
   shared_examples 'foo baz project' do
