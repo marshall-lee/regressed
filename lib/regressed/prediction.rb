@@ -5,16 +5,14 @@ module Regressed
   class Prediction
     Types = [:rspec, :minitest].freeze
 
-    attr_reader :file_path, :type, :repo_path, :repo
+    attr_reader :file_path, :type, :repo
 
-    def initialize(file_path, type, repo_path: '.')
+    def initialize(file_path, type, repo)
       @file_path = file_path
       @type = type
-      @repo_path = repo_path
+      @repo = repo
 
       fail "unknown type `#{type.inspect}`" unless Types.include?(type)
-
-      @repo = Rugged::Repository.new(repo_path)
 
       build_cov_map!
       build_affected!
@@ -22,7 +20,7 @@ module Regressed
 
     def entries
       infos = affected.flat_map do |path, line|
-        cov_map[File.expand_path(path, repo_path)][line].to_a
+        cov_map[File.expand_path(path, repo.workdir)][line].to_a
       end
       infos.uniq!
 

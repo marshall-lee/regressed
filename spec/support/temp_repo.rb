@@ -14,7 +14,7 @@ module TempRepo
     FileUtils.rmtree File.join(tmp_dir, '.')
   end
 
-  attr_reader :repo_path
+  attr_reader :repo
 
   def user_name
     'Alan Turing'
@@ -40,7 +40,7 @@ module TempRepo
 
   def write_fixture_subdir(subdir, to='.', commit: true)
     fixture_path = File.join(File.dirname(__FILE__), 'fixtures', *subdir)
-    FileUtils.cp_r File.join(fixture_path, '.'), File.join(repo_path, to)
+    FileUtils.cp_r File.join(fixture_path, '.'), File.join(repo.workdir, to)
     if commit
       add_all_to_stage
       commit("add #{File.join(*subdir)}")
@@ -74,14 +74,14 @@ module TempRepo
   end
 
   def commit_file(path)
-    full_path = File.join(repo_path, path)
+    full_path = File.join(repo.workdir, path)
     new_file = !File.exist?(full_path)
     add_to_stage(path)
     commit(new_file ? "add #{path}" : "update #{path}")
   end
 
   def write_file(path, contents, commit: true)
-    full_path = File.join(repo_path, path)
+    full_path = File.join(repo.workdir, path)
     File.write full_path, contents
     commit_file path if commit
   end
@@ -100,13 +100,13 @@ module TempRepo
   end
 
   def create_repo(name)
-    @repo_path = File.join tmp_dir, name
+    repo_workdir = File.join tmp_dir, name
 
-    destroy_repo
-    FileUtils.mkdir_p repo_path
-    Rugged::Repository.init_at repo_path
+    FileUtils.mkdir_p repo_workdir
+    Rugged::Repository.init_at repo_workdir
 
-    @repo = Rugged::Repository.new(repo_path)
+    @repo = Rugged::Repository.new(repo_workdir)
+
     @repo.config['user.name'] = user_name
     @repo.config['user.email'] = user_email
     if block_given?
@@ -116,7 +116,7 @@ module TempRepo
   end
 
   def destroy_repo(name=nil)
-    FileUtils.rmtree (name ? File.join(tmp_dir, name) : repo_path)
+    FileUtils.rmtree (name ? File.join(tmp_dir, name) : repo.workdir)
   end
 
   def execute(cmd, env={})
