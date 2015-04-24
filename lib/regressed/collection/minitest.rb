@@ -3,7 +3,7 @@ require 'minitest'
 module Regressed
   module Collection
     class Minitest < Base
-      def initialize
+      def initialize(*)
         super
 
         me = self

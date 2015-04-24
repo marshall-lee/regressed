@@ -2,8 +2,8 @@ require 'rugged'
 
 module Regressed
   class Repository
-    def initialize(path)
-      @git = Rugged::Repository.new(path)
+    def initialize(git)
+      @git = git
     end
 
     attr_reader :git

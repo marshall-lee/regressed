@@ -3,7 +3,7 @@ require 'rspec'
 module Regressed
   module Collection
     class RSpec < Base
-      def initialize
+      def initialize(*)
         super
 
         ::RSpec.configuration.around(:example, &method(:run_example))

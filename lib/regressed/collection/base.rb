@@ -7,13 +7,10 @@ require 'regressed/collection/base'
 module Regressed
   module Collection
     class Base
-      def initialize
+      def initialize(git)
         Coverage.start
         @records = []
-
-        repo = Repository.new('.')
-
-        @oid = repo.head_oid
+        @repo = Repository.new(git)
       end
 
       def sniff_coverage(info)
@@ -49,7 +46,7 @@ module Regressed
 
       def as_json
         {
-          oid: @oid,
+          oid: repo.head_oid,
           records: @records
         }
       end
@@ -59,6 +56,10 @@ module Regressed
           f.write JSON.dump(as_json)
         end
       end
+
+      private
+
+      attr_reader :repo
     end
   end
 end
