@@ -13,19 +13,27 @@ module Regressed
         end
       end
 
-      def initialize(file_path, repo)
-        @file_path = file_path
+      def initialize(raw_data, repo)
+        @raw_data = raw_data
         @repo = repo
 
         build_cov_map!
         build_affected!
       end
 
+      def self.load_json_dump(file, repo)
+        text = if file.kind_of? IO
+                 file.read
+               else
+                 File.read(file)
+               end
+        raw_data = JSON.parse text
+        new(raw_data, repo)
+      end
+
       def entry_class
         raise NotImplementedError
       end
-
-      attr_reader :file_path, :repo
 
       def entries
         infos = affected.flat_map do |path, line|
@@ -38,12 +46,10 @@ module Regressed
 
       private
 
-      def data
-        @data ||= JSON.parse File.read file_path
-      end
+      attr_reader :raw_data, :repo
 
       def oid
-        data['oid']
+        raw_data['oid']
       end
 
       def cov_map
@@ -59,7 +65,7 @@ module Regressed
       end
 
       def build_cov_map!
-        data['records'].each do |hash|
+        raw_data['records'].each do |hash|
           info = hash['info']
 
           hash['files'].each do |path, lines|

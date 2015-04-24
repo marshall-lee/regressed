@@ -112,8 +112,8 @@ describe 'Integration with test frameworks' do
     end
 
     let(:prediction) do
-      Regressed::Prediction::RSpec.new File.join(repo.workdir, '.regressed-rspec.json'),
-                                       repo
+      Regressed::Prediction::RSpec.load_json_dump File.join(repo.workdir, '.regressed-rspec.json'),
+                                                  repo
     end
 
 
@@ -138,8 +138,8 @@ describe 'Integration with test frameworks' do
     end
 
     let(:prediction) do
-      Regressed::Prediction::Minitest.new File.join(repo.workdir, '.regressed-minitest.json'),
-                                          repo
+      Regressed::Prediction::Minitest.load_json_dump File.join(repo.workdir, '.regressed-minitest.json'),
+                                                     repo
     end
 
     let(:whatever_bars) {
