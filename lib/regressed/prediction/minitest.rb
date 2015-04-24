@@ -1,8 +1,14 @@
 module Regressed
-  class Prediction
+  module Prediction
     class Minitest < Base
-      def cmd
-        "rake test #{info['file']}"
+      class Entry < Base::Entry
+        def cmd
+          "rake test #{info['file']}"
+        end
+      end
+
+      def entry_class
+        Minitest::Entry
       end
     end
   end

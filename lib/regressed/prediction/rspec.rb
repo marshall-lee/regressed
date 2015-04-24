@@ -1,12 +1,18 @@
 module Regressed
-  class Prediction
+  module Prediction
     class RSpec < Base
-      def cmd
-        "rspec #{info['spec']}:#{info['line']}"
+      class Entry < Base::Entry
+        def cmd
+          "rspec #{info['spec']}:#{info['line']}"
+        end
+
+        def full
+          info['full']
+        end
       end
 
-      def full
-        info['full']
+      def entry_class
+        RSpec::Entry
       end
     end
   end

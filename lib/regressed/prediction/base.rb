@@ -1,14 +1,106 @@
 module Regressed
-  class Prediction
+  module Prediction
     class Base
-      attr_reader :info
+      class Entry
+        attr_reader :info
 
-      def initialize(info)
-        @info = info
+        def initialize(info)
+          @info = info
+        end
+
+        def cmd
+          raise NotImplementedError
+        end
       end
 
-      def cmd
+      def initialize(file_path, repo)
+        @file_path = file_path
+        @repo = repo
+
+        build_cov_map!
+        build_affected!
+      end
+
+      def entry_class
         raise NotImplementedError
+      end
+
+      attr_reader :file_path, :repo
+
+      def entries
+        infos = affected.flat_map do |path, line|
+          cov_map[File.expand_path(path, repo.workdir)][line].to_a
+        end
+        infos.uniq!
+
+        infos.map(&entry_class.method(:new))
+      end
+
+      private
+
+      def data
+        @data ||= JSON.parse File.read file_path
+      end
+
+      def oid
+        data['oid']
+      end
+
+      def cov_map
+        @cov_map ||= Hash.new do |hash, file|
+          hash[file] = Hash.new do |i, line|
+            i[line] = Set.new
+          end
+        end
+      end
+
+      def affected
+        @affected ||= Set.new
+      end
+
+      def build_cov_map!
+        data['records'].each do |hash|
+          info = hash['info']
+
+          hash['files'].each do |path, lines|
+            file_map = cov_map[path]
+
+            lines.each do |i|
+              file_map[i + 1] << info
+            end
+          end
+        end
+      end
+
+      def build_affected!
+        repo.diff_workdir(oid).each_patch do |patch|
+          path = patch.delta.old_file[:path]
+
+          patch.each_hunk do |hunk|
+            additions = []
+            deletions = []
+            untouched = {}
+
+            hunk.each_line do |line|
+              case line.line_origin
+              when :addition then additions << line
+              when :deletion then deletions << line
+              when :context  then untouched[line.new_lineno] = line
+              end
+            end
+
+            additions.each do |line|
+              before_line = untouched[line.new_lineno - 1]
+              after_line = untouched[line.new_lineno + 1]
+              affected << [path, before_line.old_lineno] if before_line
+              affected << [path, after_line.old_lineno] if after_line
+            end
+
+            deletions.each do |line|
+              affected << [path, line.old_lineno]
+            end
+          end
+        end
       end
     end
   end
