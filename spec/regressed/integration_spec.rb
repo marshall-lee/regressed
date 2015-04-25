@@ -5,7 +5,7 @@ describe 'Integration with test frameworks' do
     clear_tmp_dir!
     create_repo 'whatever'
     write_fixture_subdir 'whatever', '.'
-    execute 'bundle install > /dev/null'
+    execute 'bundle install'# > /dev/null'
     commit_file 'Gemfile.lock'
   end
 
