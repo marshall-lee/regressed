@@ -7,5 +7,3 @@ module Regressed
 end
 
 require 'regressed/prediction/base'
-require 'regressed/prediction/minitest'
-require 'regressed/prediction/rspec'
