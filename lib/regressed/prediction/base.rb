@@ -53,9 +53,9 @@ module Regressed
       end
 
       def cov_map
-        @cov_map ||= Hash.new do |hash, file|
-          hash[file] = Hash.new do |i, line|
-            i[line] = Set.new
+        @cov_map ||= Hash.new do |cov_map, path|
+          cov_map[path] = Hash.new do |file_map, line|
+            file_map[line] = Set.new
           end
         end
       end
@@ -65,14 +65,14 @@ module Regressed
       end
 
       def build_cov_map!
-        raw_data['records'].each do |hash|
-          info = hash['info']
+        raw_data['records'].each do |record|
+          info = record['info']
 
-          hash['files'].each do |path, lines|
+          record['files'].each do |path, lines|
             file_map = cov_map[path]
 
-            lines.each do |i|
-              file_map[i + 1] << info
+            lines.each do |lineno|
+              file_map[lineno + 1] << info
             end
           end
         end
