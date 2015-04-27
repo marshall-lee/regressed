@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'regressed'
+require 'regressed/cli'
+require 'regressed/cli/rspec'
+
+cli = Regressed::CLI::RSpec.new
+result = cli.run
+exit result

@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require 'bundler/setup'
+require 'regressed'
+require 'regressed/cli'
+require 'regressed/cli/minitest'
+
+cli = Regressed::CLI::Minitest.new
+result = cli.run
+exit result
