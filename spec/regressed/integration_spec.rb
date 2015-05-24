@@ -24,7 +24,7 @@ describe 'Integration with test frameworks' do
       end
     end
 
-    describe 'when adding a line' do
+    describe 'when appending a line to bar' do
       before do
         insert_line 'lib/whatever.rb', 8, '    fail' # append to method `bar`
       end
@@ -36,7 +36,7 @@ describe 'Integration with test frameworks' do
         )
       end
 
-      describe 'and one more line' do
+      describe 'and one more line to baz' do
         before do
           insert_line 'lib/whatever.rb', 12, '    lol' # prepend to method `baz`
         end
