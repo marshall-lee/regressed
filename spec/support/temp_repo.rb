@@ -5,6 +5,24 @@ RSpec.configure do |c|
   c.add_setting :temp_repo_dir, default: File.join('.', 'tmp', 'git')
 end
 
+RSpec.shared_context 'test repository' do
+  before(:all) do
+    clear_tmp_dir!
+    create_repo 'whatever'
+    write_fixture_subdir 'whatever', '.'
+    execute 'bundle install > /dev/null'
+    commit_file 'Gemfile.lock'
+  end
+
+  after(:example) do
+    undo_changes!
+  end
+
+  after(:all) do
+    destroy_repo 'whatever'
+  end
+end
+
 module TempRepo
   def tmp_dir
     File.expand_path(RSpec.configuration.temp_repo_dir)
@@ -99,6 +117,13 @@ module TempRepo
     @repo.reset @repo.head.target, :hard
   end
 
+  def remove_coverage_files
+    coverage_files = File.join(repo.workdir, '.regressed-*.json')
+    Dir.glob(coverage_files) do |file|
+      File.unlink(file)
+    end
+  end
+
   def create_repo(name)
     repo_workdir = File.join tmp_dir, name
 
@@ -123,6 +148,13 @@ module TempRepo
     Bundler.with_clean_env do
       env.merge! 'BUNDLE_GEMFILE' => File.join(repo.workdir, 'Gemfile')
       system env, cmd, chdir: repo.workdir
+    end
+  end
+
+  def execute_capturing_output(cmd, env={})
+    Tempfile.create("output") do |f|
+      execute "#{cmd} > #{f.path}"
+      f.read
     end
   end
 end

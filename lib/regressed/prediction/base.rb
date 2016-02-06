@@ -1,3 +1,5 @@
+require 'json'
+
 module Regressed
   module Prediction
     class Base
@@ -8,9 +10,13 @@ module Regressed
           @info = info
         end
 
-        def cmd
+        def command_line_parameter
           raise NotImplementedError
         end
+      end
+
+      def command
+        fail NotImplementedError
       end
 
       def initialize(raw_data, repo)
