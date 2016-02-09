@@ -29,7 +29,7 @@ describe 'CLI' do
         end
 
         it 'does nothing' do
-          expect(content).to include('0 examples, 0 failures')
+          expect(content).not_to include('examples')
         end
       end
 
@@ -69,7 +69,7 @@ describe 'CLI' do
 
     context 'when ran for the first time without --collect' do
       it 'fails' do
-        exit_status = execute "bundle exec #{command} > /dev/null"
+        exit_status = execute "bundle exec #{command} 2> /dev/null"
         expect(exit_status).to be false
       end
     end

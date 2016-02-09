@@ -35,6 +35,13 @@ module Regressed
 
       def run_changed
         repository = Rugged::Repository.new('.')
+
+        # FIXME: filename should be different for different test frameworks
+        unless File.exist? '.regressed-rspec.json'
+          STDERR.puts 'Coverage data not generated. Run with --collect.'
+          return 1
+        end
+
         coverage = Regressed::Prediction::RSpec.load_json_dump '.regressed-rspec.json',
                                                                repository
 
@@ -43,12 +50,18 @@ module Regressed
                       "#{coverage.oid}, but current HEAD is " \
                       "#{repository.head.target.oid}. Please rerun all tests" \
                       " (--collect)"
-          1
+          return 1
         end
 
-        parameters = coverage.entries.map(&:command_line_parameter).join(' ')
+        # TODO: move to Regressed::Prediction::Base
+        entries = coverage.entries
+        if entries.empty?
+          STDERR.puts 'No changes affecting tests'
+        else
+          parameters = entries.map(&:command_line_parameter).join(' ')
 
-        system "#{coverage.command} #{parameters}"
+          system "#{coverage.command} #{parameters}"
+        end
         0
       end
     end
