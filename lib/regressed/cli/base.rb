@@ -19,8 +19,6 @@ module Regressed
         else
           run_changed
         end
-
-        0
       rescue StandardError, SyntaxError => e
         $stderr.puts e.message
         $stderr.puts e.backtrace
@@ -32,14 +30,26 @@ module Regressed
       def collect
         env = { 'REGRESSED_COLLECT' => '1' }
         system env, collect_command
+        0
       end
 
       def run_changed
+        repository = Rugged::Repository.new('.')
         coverage = Regressed::Prediction::RSpec.load_json_dump '.regressed-rspec.json',
-                                                               Rugged::Repository.new('.')
+                                                               repository
+
+        if coverage.oid != repository.head.target.oid
+          STDERR.puts "Coverage data was generated for commit " \
+                      "#{coverage.oid}, but current HEAD is " \
+                      "#{repository.head.target.oid}. Please rerun all tests" \
+                      " (--collect)"
+          1
+        end
+
         parameters = coverage.entries.map(&:command_line_parameter).join(' ')
 
         system "#{coverage.command} #{parameters}"
+        0
       end
     end
   end

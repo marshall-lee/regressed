@@ -50,13 +50,13 @@ module Regressed
         infos.map(&entry_class.method(:new))
       end
 
-      private
-
-      attr_reader :raw_data, :repo
-
       def oid
         raw_data['oid']
       end
+
+      private
+
+      attr_reader :raw_data, :repo
 
       def cov_map
         @cov_map ||= Hash.new do |cov_map, path|

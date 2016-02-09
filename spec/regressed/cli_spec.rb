@@ -53,9 +53,16 @@ describe 'CLI' do
       end
 
       context 'after changing git head' do
-        pending 'change head ref, i.e. by commiting'
+        before do
+          write_file 'commit_me', 'test'
+          commit_file 'commit_me'
+        end
+
         describe 'when ran again without --collect' do
-          it 'fails'
+          it 'fails' do
+            exit_status = execute "bundle exec #{command} 2> /dev/null"
+            expect(exit_status).to be false
+          end
         end
       end
     end
