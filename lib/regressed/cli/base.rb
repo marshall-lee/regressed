@@ -5,19 +5,26 @@ require 'regressed/prediction/rspec'
 module Regressed
   module CLI
     class Base
-      def run(args = ARGV)
 
+      # FIXME: needs refactoring
+
+      def run(args = ARGV)
         options = {}
         OptionParser.new do |opts|
           opts.on '--collect' do
             options[:collect] = true
           end
+          opts.on '--tests' do
+            options[:tests] = true
+          end
         end.parse!
 
         if options[:collect]
           collect
+        elsif options[:tests]
+          show_changed_tests
         else
-          run_changed
+          run_changed_tests
         end
       rescue StandardError, SyntaxError => e
         $stderr.puts e.message
@@ -33,7 +40,26 @@ module Regressed
         0
       end
 
-      def run_changed
+      def run_changed_tests
+        on_coverage do |coverage|
+          parameters = coverage.entries.map(&:command_line_parameter).join(' ')
+          system "#{coverage.command} #{parameters}"
+          $?.exitstatus
+        end
+      end
+
+      def show_changed_tests
+        on_coverage do |coverage|
+          puts 'Affected tests:'
+          coverage.entries.map(&:command_line_parameter).each do |t|
+            puts t
+          end
+        end
+      end
+
+      # Get coverage data and run block with it or print error and return exit
+      # status
+      def on_coverage
         repository = Rugged::Repository.new('.')
 
         # FIXME: filename should be different for different test frameworks
@@ -58,9 +84,7 @@ module Regressed
         if entries.empty?
           STDERR.puts 'No changes affecting tests'
         else
-          parameters = entries.map(&:command_line_parameter).join(' ')
-
-          system "#{coverage.command} #{parameters}"
+          yield coverage
         end
         0
       end

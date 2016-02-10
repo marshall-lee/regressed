@@ -36,9 +36,9 @@ describe 'CLI' do
         end
       end
 
-      pending 'when ran with --tests' do
+      describe 'when ran with --tests' do
         let!(:content) do
-          execute_capturing_output "bundle exec #{command} --tests"
+          execute_capturing_output "bundle exec #{command} --tests 2> /dev/null"
         end
 
         it 'displays empty result' do
@@ -61,7 +61,13 @@ describe 'CLI' do
           end
 
           describe 'with --tests' do
-            it 'displays list of 2 tests: bars and bars_again'
+            let(:content) do
+              execute_capturing_output "bundle exec #{command} --tests"
+            end
+
+            it 'outputs some test file name' do
+              expect(content).to match(/whatever_.*\.rb/)
+            end
           end
 
           describe 'with --collect' do
@@ -78,7 +84,7 @@ describe 'CLI' do
                 execute "bundle exec #{command} > /dev/null"
               end
 
-              it 'exits with 0' do
+              it 'exits with status 0' do
                 expect(exit_status_3).to be true
               end
             end
