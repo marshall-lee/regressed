@@ -1,21 +1,7 @@
 require 'spec_helper'
 
 describe 'Integration with test frameworks' do
-  before(:all) do
-    clear_tmp_dir!
-    create_repo 'whatever'
-    write_fixture_subdir 'whatever', '.'
-    execute 'bundle install > /dev/null'
-    commit_file 'Gemfile.lock'
-  end
-
-  after(:example) do
-    undo_changes!
-  end
-
-  after(:all) do
-    destroy_repo 'whatever'
-  end
+  include_context 'test repository'
 
   shared_examples 'foo baz project' do
     describe 'when nothing is changed' do
@@ -108,7 +94,7 @@ describe 'Integration with test frameworks' do
 
   describe 'with RSpec' do
     before(:all) do
-      execute 'bundle exec rspec > /dev/null', 'COLLECTION' => '1'
+      execute 'bundle exec rspec > /dev/null', 'REGRESSED_COLLECT' => '1'
     end
 
     let(:prediction) do
@@ -134,7 +120,7 @@ describe 'Integration with test frameworks' do
 
   describe 'with Minitest' do
     before(:all) do
-      execute 'ruby -I lib spec/whatever_test.rb > /dev/null', 'COLLECTION' => '1'
+      execute 'ruby -I lib spec/whatever_test.rb > /dev/null', 'REGRESSED_COLLECT' => '1'
     end
 
     let(:prediction) do
