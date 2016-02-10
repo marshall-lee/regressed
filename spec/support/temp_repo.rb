@@ -153,7 +153,8 @@ module TempRepo
 
   def execute_capturing_output(cmd, env={})
     Tempfile.create("output") do |f|
-      execute "#{cmd} > #{f.path}"
+      exit_status = execute "#{cmd} > #{f.path}"
+      fail "Command #{cmd} exited: #{$?}" unless exit_status
       f.read
     end
   end

@@ -14,8 +14,11 @@ describe 'CLI' do
 
   shared_examples 'foo baz project' do
     context 'when first ran with --collect' do
-      before do
-        exit_status = execute "bundle exec #{command} --collect > /dev/null"
+      let!(:exit_status) do
+        execute "bundle exec #{command} --collect > /dev/null"
+      end
+
+      it 'exits with status 0' do
         expect(exit_status).to be true
       end
 
@@ -24,8 +27,8 @@ describe 'CLI' do
       end
 
       describe 'when ran again' do
-        let(:content) do
-          execute_capturing_output "bundle exec #{command}"
+        let!(:content) do
+          execute_capturing_output "bundle exec #{command} 2> /dev/null"
         end
 
         it 'does nothing' do
@@ -33,22 +36,53 @@ describe 'CLI' do
         end
       end
 
-      describe 'when ran with --tests' do
-        it 'displays empty result'
+      pending 'when ran with --tests' do
+        let!(:content) do
+          execute_capturing_output "bundle exec #{command} --tests"
+        end
+
+        it 'displays empty result' do
+          expect(content.strip).to be_empty
+        end
       end
 
-      describe 'when appending a line to bar' do
+      describe 'then appending a line to bar' do
         before do
           insert_line 'lib/whatever.rb', 8, '    fail' # append to method `bar`
         end
 
-        it 'runs tests for bars and bars_again' do
-          content = execute_capturing_output "bundle exec #{command}"
-          expect(content).to include('2 examples, 2 failures')
-        end
+        describe 'then ran again' do
+          describe 'without args' do
+            let!(:content) { execute_capturing_output "bundle exec #{command}" }
 
-        describe 'when ran with --tests' do
-          it 'displays list of 2 tests: bars and bars_again'
+            it 'runs tests for bars and bars_again' do
+              expect(content).to include('2 examples, 2 failures')
+            end
+          end
+
+          describe 'with --tests' do
+            it 'displays list of 2 tests: bars and bars_again'
+          end
+
+          describe 'with --collect' do
+            let!(:exit_status_2) do
+              execute "bundle exec #{command} --collect > /dev/null"
+            end
+
+            it 'exits with status 0' do
+              expect(exit_status_2).to be true
+            end
+
+            describe 'then ran again without arguments' do
+              let!(:exit_status_3) do
+                execute "bundle exec #{command} > /dev/null"
+              end
+
+              it 'exits with 0' do
+                expect(exit_status_3).to be true
+              end
+            end
+          end
         end
       end
 
@@ -67,10 +101,23 @@ describe 'CLI' do
       end
     end
 
-    context 'when ran for the first time without --collect' do
-      it 'fails' do
-        exit_status = execute "bundle exec #{command} 2> /dev/null"
-        expect(exit_status).to be false
+    context 'on fresh dir without coverage file' do
+      describe 'when ran without arguments' do
+        let!(:exit_status) { execute "bundle exec #{command} 2> /dev/null" }
+
+        it 'fails' do
+          expect(exit_status).to be false
+        end
+      end
+
+      describe 'when ran with --tests' do
+        let!(:exit_status) do
+          execute "bundle exec #{command} --tests 2> /dev/null"
+        end
+
+        it 'fails' do
+          expect(exit_status).to be false
+        end
       end
     end
   end
